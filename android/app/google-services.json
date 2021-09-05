@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "80671143372",
+    "firebase_url": "https://helpdesk-ed0e5-default-rtdb.firebaseio.com",
+    "project_id": "helpdesk-ed0e5",
+    "storage_bucket": "helpdesk-ed0e5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:80671143372:android:8ac13a6a3f2940b06a5969",
+        "android_client_info": {
+          "package_name": "com.helpdeskapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "80671143372-hjls5dnv1ch33b66dbittdmr95pmb37s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCdooUC6XPVUr8vfdudbSvd8dxMGh2MUw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "80671143372-hjls5dnv1ch33b66dbittdmr95pmb37s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

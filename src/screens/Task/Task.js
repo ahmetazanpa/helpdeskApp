@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {
     FormControl,
     Input,
@@ -9,9 +9,24 @@ import {
     CheckIcon,
     VStack,
 } from "native-base"
+import firestore from '@react-native-firebase/firestore';
 
 const Task = () => {
-    let [language, setLanguage] = React.useState("")
+    const [users, setUsers] = useState([])
+    const [user, setUser] = useState("")
+
+    useEffect(() => {
+        const subscriber = firestore()
+          .collection('users')
+          .doc('4aSGOqYecSLTwoDOM2Fd')
+          .get()
+          .then(documentSnapshot => {
+            setUsers(documentSnapshot.data().user)
+          });
+        // Stop listening for updates when no longer required
+        return () => subscriber();
+      }, []);
+    
     return (
         <ScrollView>
             <Stack space={4} px={4} safeArea mt={6}>
@@ -30,21 +45,21 @@ const Task = () => {
                     <FormControl.Label>Problemi Yaşayan Kişi</FormControl.Label>
                     <VStack space={4}>
                         <Select
-                            selectedValue={language}
+                            selectedValue={user}
                             minWidth={200}
-                            accessibilityLabel="Select your favorite programming language"
-                            placeholder="Select your favorite programming language"
-                            onValueChange={(itemValue) => setLanguage(itemValue)}
+                            accessibilityLabel="İsim Soyisminizi Seçiniz"
+                            placeholder="İsim Soyisminizi Seçiniz"
+                            onValueChange={(itemValue) => setUser(itemValue)}
                             _selectedItem={{
                                 bg: "cyan.600",
                                 endIcon: <CheckIcon size={4} />,
                             }}
                         >
-                            <Select.Item label="JavaScript" value="js" />
-                            <Select.Item label="TypeScript" value="ts" />
-                            <Select.Item label="C" value="c" />
-                            <Select.Item label="Python" value="py" />
-                            <Select.Item label="Java" value="java" />
+                        {
+                            users.map((user) => {
+                                <Select.Item label={user.nameSurname + "/t(" + user.title + ")" } value={user.nameSurname} />
+                            })
+                        }
                         </Select>
                     </VStack>
                     <FormControl.HelperText>
