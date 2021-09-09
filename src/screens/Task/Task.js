@@ -1,14 +1,17 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     FormControl,
-    Input,
     TextArea,
     Button,
+    Collapse,
+    IconButton,
+    CloseIcon,
     Stack,
     Select,
     ScrollView,
     CheckIcon,
     VStack,
+    Alert
 } from "native-base"
 import firestore from '@react-native-firebase/firestore';
 
@@ -20,35 +23,43 @@ const Task = () => {
     const [titles, setTitles] = useState([])
     const [taskTitle, setTaskTitle] = useState("")
     const [taskDetail, setTaskDetail] = useState("")
+    const [alertVisible, setAlertVisible] = useState(false)
 
     useEffect(() => {
         firestore()
-          .collection('users')
-          .doc('4aSGOqYecSLTwoDOM2Fd')
-          .get()
-          .then(documentSnapshot => {
-              setUsers(documentSnapshot.data().user)
-          });
+            .collection('users')
+            .doc('4aSGOqYecSLTwoDOM2Fd')
+            .get()
+            .then(documentSnapshot => {
+                setUsers(documentSnapshot.data().user)
+            });
 
-          firestore()
-          .collection('taskTitle')
-          .doc('CExZSljPUoBV53fOuDR3')
-          .get()
-          .then(documentSnapshot => {
-              setTitles(documentSnapshot.data().title)
-          });
+        firestore()
+            .collection('taskTitle')
+            .doc('CExZSljPUoBV53fOuDR3')
+            .get()
+            .then(documentSnapshot => {
+                setTitles(documentSnapshot.data().title)
+            });
 
-      }, []);
-     
+    }, []);
+
     const addItem = async () => {
-        setLoading(true);
-        await firestore().collection('tasks').add({
-            taskTitle: taskTitle,
-            taskDetail: taskDetail,
-            user: user
-        });
-        setLoading(false);
-    }  
+        if (taskTitle !== "" && taskDetail !== "" && user !== "") {
+            setAlertVisible(false)
+            setLoading(true);
+            await firestore().collection('tasks').add({
+                taskTitle: taskTitle,
+                taskDetail: taskDetail,
+                user: user
+            });
+            setLoading(false);
+            setButtonVisible(true)
+        }
+        else {
+            setAlertVisible(true)
+        }
+    }
 
     return (
         <ScrollView>
@@ -61,17 +72,17 @@ const Task = () => {
                             minWidth={200}
                             accessibilityLabel="Yaşamış olduğunuz problemi seçiniz"
                             placeholder="Yaşamış olduğunuz problemi seçiniz"
-                            onValueChange={(itemValue) => setTaskTitle(itemValue)}
+                            onValueChange={(itemValue) => { setTaskTitle(itemValue) }}
                             _selectedItem={{
                                 bg: "cyan.600",
                                 endIcon: <CheckIcon size={4} />,
                             }}
                         >
-                        {
-                            titles.map(title => {
-                                return <Select.Item key={title} label={title} value={title} />
-                            })
-                        }
+                            {
+                                titles.map(title => {
+                                    return <Select.Item key={title} label={title} value={title} />
+                                })
+                            }
                         </Select>
                     </VStack>
                 </FormControl>
@@ -87,21 +98,39 @@ const Task = () => {
                             minWidth={200}
                             accessibilityLabel="İsim Soyisminizi Seçiniz"
                             placeholder="İsim Soyisminizi Seçiniz"
-                            onValueChange={(itemValue) => setUser(itemValue)}
+                            onValueChange={(itemValue) => { setUser(itemValue) }}
                             _selectedItem={{
                                 bg: "cyan.600",
                                 endIcon: <CheckIcon size={4} />,
                             }}
                         >
-                        {
-                            users.map(user => {
-                                return <Select.Item key={user.nameSurname} label={user.nameSurname + "\t(" + user.title + ")" } value={user.nameSurname} />
-                            })
-                        }
+                            {
+                                users.map(user => {
+                                    return <Select.Item key={user.nameSurname} label={user.nameSurname + "\t(" + user.title + ")"} value={user.nameSurname} />
+                                })
+                            }
                         </Select>
                     </VStack>
                 </FormControl>
-                <Button isLoading={loading} isLoadingText="Oluştur" variant="solid" onPress={ addItem }>
+                <Collapse isOpen={alertVisible}>
+                    <Alert
+                        status="error"
+                        action={
+                            <IconButton
+                                icon={<CloseIcon size="xs" />}
+                                onPress={() => setAlertVisible(false)}
+                            />
+                        }
+                        actionProps={{
+                            alignSelf: "center",
+                        }}
+                    >
+                        <Alert.Icon />
+                        <Alert.Title>Uyarı</Alert.Title>
+                        <Alert.Description>Boş alan bırakmayınız</Alert.Description>
+                    </Alert>
+                </Collapse>
+                <Button isLoading={loading} isLoadingText="Oluştur" variant="solid" onPress={addItem}>
                     OLUŞTUR
                 </Button>
             </Stack>
