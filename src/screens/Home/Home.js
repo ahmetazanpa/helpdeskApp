@@ -25,7 +25,7 @@ const Home = ({ navigation }) => {
             <FlatList
                 data={tasks}
                 renderItem={({ item }) => (
-                    <View style={{ justifyContent: 'space-between', margin:10, backgroundColor: '#d2d2d2', borderRadius: 25}}>
+                    <View style={{ justifyContent: 'space-between', margin:10,  borderRadius: 25}}>
                             <Text px={5} py={2} rounded="md" my={1} >
                                 {item.taskTitle}
                             </Text>
