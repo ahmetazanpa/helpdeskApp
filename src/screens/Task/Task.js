@@ -54,7 +54,6 @@ const Task = () => {
                 user: user
             });
             setLoading(false);
-            setButtonVisible(true)
         }
         else {
             setAlertVisible(true)
