@@ -1,13 +1,12 @@
 import React, { useMemo, useReducer, useEffect, useState } from 'react';
 import 'react-native-gesture-handler';
-import { View, ActivityIndicator } from 'react-native';
 import {
   NavigationContainer,
   DefaultTheme as NavigationDefaultTheme,
   DarkTheme as NavigationDarkTheme
 } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-//import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NativeBaseProvider, theme } from 'native-base';
 import {
   Provider as PaperProvider,
@@ -22,30 +21,39 @@ import Settings from './screens/Settings/Settings';
 import SignInScreen from './screens/Auth/SignInScreen';
 
 const Stack = createStackNavigator();
-//const Drawer = createDrawerNavigator();
-
-// function MyDrawer() {
-//     return (
-//       <Drawer.Navigator>
-//         <Drawer.Screen name="Home" component={Home} />
-//         <Drawer.Screen name="Settings" component={Settings} />
-//       </Drawer.Navigator>
-//     );
-//   }
-{/*//rgb(6, 182, 212)*/ }
+const Drawer = createDrawerNavigator();
 
 const Auth = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false, }}>
       <Stack.Screen name="SingIn" component={SignInScreen} />
+      <Stack.Screen name="Root" component={Root} />
+      {/* {loginState.userToken == null ?
+        (
+          <Stack.Screen name="Auth" component={Auth} />
+        )
+        :
+        (
+          <Stack.Screen name="Home" component={HomePage} options={{ title: 'Görev Listesi', headerTintColor: '#FFFF', headerTitleAlign: 'center', headerLeft }}/>
+        )
+      } */}
     </Stack.Navigator>
   )
 }
 
-const HomePage = () => {
+const Root = () => {
+  return (
+    <Drawer.Navigator screenOptions={{ headerStyle: { backgroundColor: '#0e7490' } }} backBehavior="goBack">
+      <Drawer.Screen name="HomePage" component={Home} options={{ title: 'Görev Listesi', headerTintColor: '#FFFF', headerTitleAlign: 'center', }} />
+      <Drawer.Screen name="TaskPage" component={TaskPage} options={{ headerShown: false }} />
+    </Drawer.Navigator>
+  );
+}
+{/*//rgb(6, 182, 212)*/ }
+
+const TaskPage = () => {
   return (
     <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#0e7490' } }}>
-      <Stack.Screen name="Home" component={Home} options={{ title: 'Görev Listesi', headerTintColor: '#FFFF', headerTitleAlign: 'center', }} />
       <Stack.Screen name="Task" component={Task} options={{ title: 'Yeni Görev', headerTintColor: '#FFFF', headerTitleAlign: 'center' }} />
     </Stack.Navigator>
   )
@@ -118,7 +126,7 @@ const App = () => {
 
   const authContext = useMemo(() => ({
     signIn: async (foundUser) => {
-        console.log(foundUser);
+      console.log(foundUser);
       // setUserToken('fgkj');
       // setIsLoading(false);
       const userToken = String(foundUser[0].userToken);
@@ -173,19 +181,7 @@ const App = () => {
       <AuthContext.Provider value={authContext}>
         <NavigationContainer theme={theme}>
           <NativeBaseProvider>
-            <Stack.Navigator screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="Auth" component={Auth} />
-              <Stack.Screen name="Home" component={HomePage} options={{ title: 'Görev Listesi', headerTintColor: '#FFFF', headerTitleAlign: 'center', }} />
-              {/* {loginState.userToken == null ?
-                (
-                  <Stack.Screen name="Auth" component={Auth} />
-                )
-                :
-                (
-                  <Stack.Screen name="Home" component={HomePage} />
-                )
-              } */}
-            </Stack.Navigator>
+            <Auth />
           </NativeBaseProvider>
         </NavigationContainer>
       </AuthContext.Provider>

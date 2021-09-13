@@ -222,7 +222,7 @@ const SignInScreen = ({ navigation }) => {
                         </LinearGradient>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('Home')}
+                        onPress={() => navigation.navigate('Root')}
                         style={[styles.signIn, {
                             borderColor: '#0e7490',
                             borderWidth: 1,

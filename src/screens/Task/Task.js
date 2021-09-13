@@ -16,7 +16,7 @@ import {
 import firestore from '@react-native-firebase/firestore';
 
 
-const Task = () => {
+const Task = ({navigation}) => {
     const [users, setUsers] = useState([])
     const [user, setUser] = useState("")
     const [loading, setLoading] = useState(false)
