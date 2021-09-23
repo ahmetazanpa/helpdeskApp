@@ -7,6 +7,7 @@ import {
     IconButton,
     CloseIcon,
     Stack,
+    Input,
     Select,
     ScrollView,
     CheckIcon,
@@ -87,28 +88,18 @@ const Task = ({navigation}) => {
                 </FormControl>
                 <FormControl>
                     <FormControl.Label>Görev Açıklaması</FormControl.Label>
-                    <TextArea onChangeText={setTaskDetail} value={taskDetail} placeholder="Yaşamış olduğunuz problemi yazınız" />
+                    <TextArea onChangeText={setTaskDetail} value={taskDetail} placeholder="Problemi ve problemin olduğu yeri yazınız" />
                 </FormControl>
                 <FormControl>
                     <FormControl.Label>Problemi Yaşayan Kişi</FormControl.Label>
                     <VStack space={4}>
-                        <Select
-                            selectedValue={user}
+                        <Input 
                             minWidth={200}
-                            accessibilityLabel="İsim Soyisminizi Seçiniz"
-                            placeholder="İsim Soyisminizi Seçiniz"
-                            onValueChange={(itemValue) => { setUser(itemValue) }}
-                            _selectedItem={{
-                                bg: "cyan.600",
-                                endIcon: <CheckIcon size={4} />,
-                            }}
-                        >
-                            {
-                                users.map(user => {
-                                    return <Select.Item key={user.nameSurname} label={user.nameSurname + "\t(" + user.title + ")"} value={user.nameSurname} />
-                                })
-                            }
-                        </Select>
+                            accessibilityLabel="İsim Soyisminizi Yazınız"
+                            placeholder="İsim Soyisminizi Yazınız"
+                            onChangeText={(itemValue) => { setUser(itemValue) }}
+                            value={user}
+                        />
                     </VStack>
                 </FormControl>
                 <Collapse isOpen={alertVisible}>

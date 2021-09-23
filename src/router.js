@@ -5,20 +5,21 @@ import {
   DefaultTheme as NavigationDefaultTheme,
   DarkTheme as NavigationDarkTheme
 } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { NativeBaseProvider, theme } from 'native-base';
 import {
   Provider as PaperProvider,
   DefaultTheme as PaperDefaultTheme,
   DarkTheme as PaperDarkTheme
 } from 'react-native-paper';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { NativeBaseProvider } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AuthContext } from './components/context';
 import Home from './screens/Home/Home';
 import Task from './screens/Task/Task';
 import Settings from './screens/Settings/Settings';
 import SignInScreen from './screens/Auth/SignInScreen';
+import CustomDrawerContent from './components/Custom/DrawerContent/CustomDrawerContent';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -41,11 +42,13 @@ const Auth = () => {
   )
 }
 
+
+
 const Root = () => {
   return (
-    <Drawer.Navigator screenOptions={{ headerStyle: { backgroundColor: '#0e7490' } }} backBehavior="goBack">
-      <Drawer.Screen name="HomePage" component={Home} options={{ title: 'Görev Listesi', headerTintColor: '#FFFF', headerTitleAlign: 'center', }} />
-      <Drawer.Screen name="TaskPage" component={TaskPage} options={{ headerShown: false }} />
+    <Drawer.Navigator screenOptions={{ headerStyle: { backgroundColor: '#0e7490' } }} backBehavior="goBack" drawerContent={(props) => <CustomDrawerContent {...props} /> } >
+      <Drawer.Screen name="HomePage" component={Home} options={{ title: 'Görev Listesi', headerTintColor: '#FFFF', drawerActiveBackgroundColor: '#0891b2', drawerActiveTintColor: '#FFFF', headerTitleAlign: 'center', }} />
+      <Drawer.Screen name="Settings" component={Settings} options={{ title: 'Ayarlar',  headerTintColor: '#FFFF', drawerActiveBackgroundColor: '#0891b2', drawerActiveTintColor: '#FFFF', headerTitleAlign: 'center',}} />
     </Drawer.Navigator>
   );
 }
