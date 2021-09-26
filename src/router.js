@@ -49,6 +49,8 @@ const Root = () => {
     <Drawer.Navigator screenOptions={{ headerStyle: { backgroundColor: '#0e7490' } }} backBehavior="goBack" drawerContent={(props) => <CustomDrawerContent {...props} /> } >
       <Drawer.Screen name="HomePage" component={Home} options={{ title: 'Görev Listesi', headerTintColor: '#FFFF', drawerActiveBackgroundColor: '#0891b2', drawerActiveTintColor: '#FFFF', headerTitleAlign: 'center', }} />
       <Drawer.Screen name="Settings" component={Settings} options={{ title: 'Ayarlar',  headerTintColor: '#FFFF', drawerActiveBackgroundColor: '#0891b2', drawerActiveTintColor: '#FFFF', headerTitleAlign: 'center',}} />
+      <Drawer.Screen name="Task " component={TaskPage} />
+   
     </Drawer.Navigator>
   );
 }
