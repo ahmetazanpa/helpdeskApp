@@ -20,49 +20,11 @@ import Task from './screens/Task/Task';
 import Settings from './screens/Settings/Settings';
 import SignInScreen from './screens/Auth/SignInScreen';
 import CustomDrawerContent from './components/Custom/DrawerContent/CustomDrawerContent';
+import ForgotPassword from './screens/Auth/ForgotPassword';
+import TaskDetail from './screens/Task/TaskDetail';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
-
-const Auth = () => {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false, }}>
-      <Stack.Screen name="SingIn" component={SignInScreen} />
-      <Stack.Screen name="Root" component={Root} />
-      {/* {loginState.userToken == null ?
-        (
-          <Stack.Screen name="Auth" component={Auth} />
-        )
-        :
-        (
-          <Stack.Screen name="Home" component={HomePage} options={{ title: 'Görev Listesi', headerTintColor: '#FFFF', headerTitleAlign: 'center', headerLeft }}/>
-        )
-      } */}
-    </Stack.Navigator>
-  )
-}
-
-
-
-const Root = () => {
-  return (
-    <Drawer.Navigator screenOptions={{ headerStyle: { backgroundColor: '#0e7490' } }} backBehavior="goBack" drawerContent={(props) => <CustomDrawerContent {...props} /> } >
-      <Drawer.Screen name="HomePage" component={Home} options={{ title: 'Görev Listesi', headerTintColor: '#FFFF', drawerActiveBackgroundColor: '#0891b2', drawerActiveTintColor: '#FFFF', headerTitleAlign: 'center', }} />
-      <Drawer.Screen name="Settings" component={Settings} options={{ title: 'Ayarlar',  headerTintColor: '#FFFF', drawerActiveBackgroundColor: '#0891b2', drawerActiveTintColor: '#FFFF', headerTitleAlign: 'center',}} />
-      <Drawer.Screen name="Task " component={TaskPage} />
-   
-    </Drawer.Navigator>
-  );
-}
-{/*//rgb(6, 182, 212)*/ }
-
-const TaskPage = () => {
-  return (
-    <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#0e7490' } }}>
-      <Stack.Screen name="Task" component={Task} options={{ title: 'Yeni Görev', headerTintColor: '#FFFF', headerTitleAlign: 'center' }} />
-    </Stack.Navigator>
-  )
-}
 
 const App = () => {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
@@ -81,7 +43,6 @@ const App = () => {
       text: '#333333'
     }
   }
-
   const CustomDarkTheme = {
     ...NavigationDarkTheme,
     ...PaperDarkTheme,
@@ -100,14 +61,14 @@ const App = () => {
       case 'RETRIEVE_TOKEN':
         return {
           ...prevState,
-          userToken: action.token,
+          userToken: action.uid,
           isLoading: false,
         };
       case 'LOGIN':
         return {
           ...prevState,
-          eMail: action.id,
-          userToken: action.token,
+          eMail: action.email,
+          userToken: action.uid,
           isLoading: false,
         };
       case 'LOGOUT':
@@ -120,31 +81,28 @@ const App = () => {
       case 'REGISTER':
         return {
           ...prevState,
-          eMail: action.id,
-          userToken: action.token,
+          eMail: action.email,
+          userToken: action.uid,
           isLoading: false,
         };
     }
   };
 
   const [loginState, dispatch] = useReducer(loginReducer, initialLoginState);
-
+  const [email, setEmail] = useState("null")
   const authContext = useMemo(() => ({
     signIn: async (foundUser) => {
-      console.log(foundUser);
-      // setUserToken('fgkj');
-      // setIsLoading(false);
-      const userToken = String(foundUser[0].userToken);
-      const eMail = foundUser[0].email;
-      console.log(eMail)
+      //setUserToken('fgkj');
+      //setIsLoading(false);
+      const userToken = String(foundUser.uid);
+      setEmail(foundUser.email);
       try {
         await AsyncStorage.setItem('userToken', userToken);
-        console.log(userToken, "userToken singIn")
       } catch (e) {
         console.log(e);
       }
       // console.log('user token: ', userToken);
-      dispatch({ type: 'LOGIN', id: eMail, token: userToken });
+      dispatch({ type: 'LOGIN', id: email, token: userToken });
     },
     signOut: async () => {
       // setUserToken(null);
@@ -156,10 +114,10 @@ const App = () => {
       }
       dispatch({ type: 'LOGOUT' });
     },
-    signUp: () => {
-      // setUserToken('fgkj');
-      // setIsLoading(false);
-    },
+    // signUp: () => {
+    //   // setUserToken('fgkj');
+    //   // setIsLoading(false);
+    // },
     toggleTheme: () => {
       setIsDarkTheme(isDarkTheme => !isDarkTheme);
     }
@@ -168,18 +126,48 @@ const App = () => {
   useEffect(() => {
     setTimeout(async () => {
       // setIsLoading(false);
-      let userToken;
-      userToken = null;
+      let userToken = null;
       try {
         userToken = await AsyncStorage.getItem('userToken');
-        console.log(userToken, "userToken")
+        await AsyncStorage.setItem('emailAdress', email)
       } catch (e) {
         console.log(e);
       }
       // console.log('user token: ', userToken);
       dispatch({ type: 'RETRIEVE_TOKEN', token: userToken });
-    }, 1000);
+    }, 100);
   }, []);
+
+  const Auth = () => {
+    return (
+      <Stack.Navigator screenOptions={{ headerShown: false, }}>
+        <Stack.Screen name="SingIn" component={SignInScreen} />
+        <Stack.Screen name="StackPages" component={Root} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+      </Stack.Navigator>
+    )
+  }
+  
+  const Root = () => {
+    return (
+      <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#0e7490' } }}>
+        <Stack.Screen name="HomeDrawer" component={HomeDrawer} options={{ headerShown: false }} />
+        <Stack.Screen name="Task" component={Task} options={{ title: 'Yeni Görev', headerTintColor: '#FFFF', headerTitleAlign: 'center' }} />
+        <Stack.Screen name="TaskDetail" component={TaskDetail} options={{ title: 'Görev Detayı', headerTintColor: '#FFFF', headerTitleAlign: 'center' }} />
+      </Stack.Navigator>
+    )
+  }
+  
+  const HomeDrawer = () => {
+    return (
+      <Drawer.Navigator screenOptions={{ headerStyle: { backgroundColor: '#0e7490' } }} backBehavior="goBack" drawerContent={(props) => <CustomDrawerContent {...props} /> } >
+        <Drawer.Screen name="Home" component={Home} options={{ title: 'Görev Listesi', headerTintColor: '#FFFF', drawerActiveBackgroundColor: '#0891b2', drawerActiveTintColor: '#FFFF', headerTitleAlign: 'center', }} />
+        <Drawer.Screen name="Settings" component={Settings} options={{ title: 'Ayarlar',  headerTintColor: '#FFFF', drawerActiveBackgroundColor: '#0891b2', drawerActiveTintColor: '#FFFF', headerTitleAlign: 'center',}} />
+        <Drawer.Screen name="SignOut" component={ SignInScreen } options={{ headerShown: false }} />
+      
+      </Drawer.Navigator>
+    );
+  }
 
   return (
     <PaperProvider theme={theme}>

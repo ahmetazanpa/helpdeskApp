@@ -14,27 +14,23 @@ import {
     VStack,
     Alert
 } from "native-base"
-import firestore from '@react-native-firebase/firestore';
+import uuid from 'react-native-uuid'
+import UUIDGenerator from 'react-native-uuid-generator'
+import firestore from '@react-native-firebase/firestore'
 
 
 const Task = ({navigation}) => {
-    const [users, setUsers] = useState([])
+    //const [users, setUsers] = useState([])
     const [user, setUser] = useState("")
     const [loading, setLoading] = useState(false)
     const [titles, setTitles] = useState([])
     const [taskTitle, setTaskTitle] = useState("")
     const [taskDetail, setTaskDetail] = useState("")
     const [alertVisible, setAlertVisible] = useState(false)
+    const [priority, setPriority] = useState("")
+    const priorities = ["Önceliksiz", "Normal", "Öncelikli"]
 
     useEffect(() => {
-        firestore()
-            .collection('users')
-            .doc('4aSGOqYecSLTwoDOM2Fd')
-            .get()
-            .then(documentSnapshot => {
-                setUsers(documentSnapshot.data().user)
-            });
-
         firestore()
             .collection('taskTitle')
             .doc('CExZSljPUoBV53fOuDR3')
@@ -46,15 +42,19 @@ const Task = ({navigation}) => {
     }, []);
 
     const addItem = async () => {
-        if (taskTitle !== "" && taskDetail !== "" && user !== "") {
+        if (taskTitle !== "" && taskDetail !== "" && user !== "" && priority !== "") {
             setAlertVisible(false)
             setLoading(true);
             await firestore().collection('tasks').add({
+                taskId: uuid.v4(),
                 taskTitle: taskTitle,
                 taskDetail: taskDetail,
-                user: user
+                user: user,
+                priority: priority,
+                createDate: new Date(),
             });
             setLoading(false);
+            navigation.navigate("Home")
         }
         else {
             setAlertVisible(true)
@@ -100,6 +100,28 @@ const Task = ({navigation}) => {
                             onChangeText={(itemValue) => { setUser(itemValue) }}
                             value={user}
                         />
+                    </VStack>
+                </FormControl>
+                <FormControl>
+                    <FormControl.Label>Öncelik Durumu</FormControl.Label>
+                    <VStack space={4}>
+                        <Select
+                            selectedValue={priority}
+                            minWidth={200}
+                            accessibilityLabel="Görevin öncelik durumunu seçiniz"
+                            placeholder="Görevin öncelik durumunu seçiniz"
+                            onValueChange={(itemValue) => { setPriority(itemValue) }}
+                            _selectedItem={{
+                                bg: "cyan.600",
+                                endIcon: <CheckIcon size={4} />,
+                            }}
+                        >
+                            {
+                                priorities.map(priority => {
+                                    return <Select.Item key={priority} label={priority} value={priority} />
+                                })
+                            }
+                        </Select>
                     </VStack>
                 </FormControl>
                 <Collapse isOpen={alertVisible}>

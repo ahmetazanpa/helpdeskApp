@@ -1,27 +1,23 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, Platform, StyleSheet, StatusBar } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-remix-icon';
 import { Collapse, Alert } from "native-base"
-import { useTheme } from 'react-native-paper';
-import { AuthContext } from '../../components/context';
+import { useTheme, Snackbar } from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
 
-const SignInScreen = ({ navigation }) => {
+const ForgotPassword = ({ navigation }) => {
     const [data, setData] = useState({
         email: '',
-        password: '',
         check_textInputChange: false,
-        secureTextEntry: true,
         isValidUser: true,
-        isValidPassword: true,
         messageShow: false,
         message: '',
     });
-
     const { colors } = useTheme();
-    const { signIn } = useContext(AuthContext);
+    const [visible, setVisible] = useState(false);
+    const onDismissSnackBar = () => setVisible(false);
 
     const textInputChange = (val) => {
         let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
@@ -42,29 +38,6 @@ const SignInScreen = ({ navigation }) => {
         }
     }
 
-    const handlePasswordChange = (val) => {
-        if (val.trim().length >= 8) {
-            setData({
-                ...data,
-                password: val,
-                isValidPassword: true
-            });
-        } else {
-            setData({
-                ...data,
-                password: val,
-                isValidPassword: false
-            });
-        }
-    }
-
-    const updateSecureTextEntry = () => {
-        setData({
-            ...data,
-            secureTextEntry: !data.secureTextEntry
-        });
-    }
-
     const handleValidUser = (val) => {
         let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
         if (reg.test(val)) {
@@ -80,57 +53,30 @@ const SignInScreen = ({ navigation }) => {
         }
     }
 
-    const loginHandle = async () => {
-        if (data.email.length == 0 || data.password.length == 0) {
-            setData({ ...data, messageShow: true, message: 'Giriş bilgilerini boş bırakmayınız!' })
+    const sendMail = async () => {
+        if (data.email.length == 0) {
+            setData({ ...data, messageShow: true, message: 'E-Mail Adresini boş bırakmayınız!' })
             return;
         }
         else {
             try {
-                let response = await auth().signInWithEmailAndPassword(data.email, data.password)
-                signIn(response.user);
-                if (response && response.user) {
-                    navigation.navigate('StackPages')
-                }
+                await auth().sendPasswordResetEmail(data.email),
+                    setVisible(true);
+                    setTimeout(() => {
+                        navigation.navigate('SingIn')
+                    }, 3000);
             } catch (e) {
-                setData({ ...data, messageShow: true, message: 'Kullanıcı adı veya şifre yanlış!' })
+                setData({ ...data, messageShow: true, message: 'Kayıtlı E-Mail adresi bulunamadı!' })
                 return;
             }
-            //setData({ ...data, messageShow: false, message: '' })
-            //return;
         }
-        // const foundUser = Users.filter(item => {
-        //     return eMail == item.email && password == item.password;
-        // });
-        // RNSmtpMailer.sendMail({
-        //     mailhost: "smtp.gmail.com",
-        //     port: "465",
-        //     ssl: true,
-        //     username: 'ahmetazanpa@gmail.com',
-        //     password: '@51@1997!Feyza#?',
-        //     recipients: 'ahmetazanpa@hotmail.com',
-        //     subject: "subject",
-        //     htmlBody: "<h1>header</h1><p>body</p>",
-        //     attachmentNames: [
-        //         "image.jpg",
-        //         "firstFile.txt",
-        //         "secondFile.csv",
-        //         "pdfFile.pdf",
-        //         "zipExample.zip",
-        //         "pngImage.png"
-        //       ],
-        // })
-        // .then(success => console.log("data: ", success))
-        // .catch(error => console.log("err: ", error))
-
-
     }
 
     return (
         <View style={styles.container}>
             <StatusBar backgroundColor='#0e7490' barStyle="light-content" />
             <View style={styles.header}>
-                <Text style={styles.text_header}>BT DESTEK</Text>
+                <Text style={styles.text_header}>Şifremi Unuttum</Text>
                 <Collapse isOpen={data.messageShow}>
                     <Alert status="error" w="100%" >
                         <Alert.Icon />
@@ -156,7 +102,7 @@ const SignInScreen = ({ navigation }) => {
                         size={20}
                     />
                     <TextInput
-                        placeholder="E-Mail Adresinizi Yazınız"
+                        placeholder="Kayıtlı E-Mail Adresinizi Yazınız"
                         placeholderTextColor="#666666"
                         style={[styles.textInput, {
                             color: colors.text
@@ -182,58 +128,10 @@ const SignInScreen = ({ navigation }) => {
                         <Text style={styles.errorMsg}>Geçersiz e-mail adresi girdiniz.</Text>
                     </Animatable.View>
                 }
-
-
-                <Text style={[styles.text_footer, {
-                    color: colors.text,
-                    marginTop: 35
-                }]}>Parola</Text>
-                <View style={styles.action}>
-                    <Icon
-                        name="ri-rotate-lock-line"
-                        color={colors.text}
-                        size={20}
-                    />
-                    <TextInput
-                        placeholder="Parolanızı Yazınız"
-                        placeholderTextColor="#666666"
-                        secureTextEntry={data.secureTextEntry ? true : false}
-                        style={[styles.textInput, {
-                            color: colors.text
-                        }]}
-                        autoCapitalize="none"
-                        onChangeText={(val) => handlePasswordChange(val)}
-                    />
-                    <TouchableOpacity
-                        onPress={updateSecureTextEntry}
-                    >
-                        {data.secureTextEntry ?
-                            <Icon
-                                name="ri-eye-off-line"
-                                color="grey"
-                                size={20}
-                            />
-                            :
-                            <Icon
-                                name="ri-eye-line"
-                                color="grey"
-                                size={20}
-                            />
-                        }
-                    </TouchableOpacity>
-                </View>
-                {data.isValidPassword ? null :
-                    <Animatable.View animation="fadeInLeft" duration={500}>
-                        <Text style={styles.errorMsg}>Şifre 8 karakter uzunluğunda olmalıdır.</Text>
-                    </Animatable.View>
-                }
-                <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-                    <Text style={{ color: '#0e7490', marginTop: 15 }}>Şifremi Unuttum?</Text>
-                </TouchableOpacity>
                 <View style={styles.button}>
                     <TouchableOpacity
                         style={styles.signIn}
-                        onPress={() => loginHandle()}
+                        onPress={() => sendMail()}
                     >
                         <LinearGradient
                             colors={['#22d3ee', '#06b6d4']}
@@ -241,11 +139,11 @@ const SignInScreen = ({ navigation }) => {
                         >
                             <Text style={[styles.textSign, {
                                 color: '#fff'
-                            }]}>Giriş Yap</Text>
+                            }]}>Gönder</Text>
                         </LinearGradient>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('StackPages')}
+                        onPress={() => navigation.navigate('SingIn')}
                         style={[styles.signIn, {
                             borderColor: '#0e7490',
                             borderWidth: 1,
@@ -254,15 +152,26 @@ const SignInScreen = ({ navigation }) => {
                     >
                         <Text style={[styles.textSign, {
                             color: '#0e7490'
-                        }]}>Kaydolmadan Devam Et</Text>
+                        }]}>Giriş Sayfasına Dön</Text>
                     </TouchableOpacity>
+                    <Snackbar
+                        visible={visible}
+                        onDismiss={onDismissSnackBar}
+                        action={{
+                            label: 'Bilgi',
+                            onPress: () => {
+                                // Do something
+                            },
+                        }}>
+                        Şifre resetleme linki mail adresinize gönderildi. Girişe yönlendiriliyorsunuz!
+                    </Snackbar>
                 </View>
             </Animatable.View>
         </View>
-    );
-};
+    )
+}
 
-export default SignInScreen;
+export default ForgotPassword
 
 const styles = StyleSheet.create({
     container: {
@@ -273,10 +182,10 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'flex-end',
         paddingHorizontal: 20,
-        paddingBottom: 50
+        paddingBottom: 80
     },
     footer: {
-        flex: 3,
+        flex: 1,
         backgroundColor: '#fff',
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
